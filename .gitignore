@@ -1,0 +1,8 @@
+#ignore all auto generated files except the mango-contract
+
+_gateways
+_msp
+_wallets
+bin
+builders
+config
