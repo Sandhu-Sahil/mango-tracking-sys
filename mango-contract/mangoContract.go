@@ -99,6 +99,25 @@ func (c *MangoContract) DeleteMango(ctx contractapi.TransactionContextInterface,
 	return ctx.GetStub().DelState(mangoID)
 }
 
+func (c *MangoContract) SellMango(ctx contractapi.TransactionContextInterface, mangoID string,
+	owner string, newOwner string) error {
+	exists, err := c.MangoExists(ctx, mangoID)
+	if err != nil {
+		return fmt.Errorf("could not read from world state. %s", err)
+	} else if !exists {
+		return fmt.Errorf("the asset %s does not exist", mangoID)
+	}
+	mango, _ := c.ReadMango(ctx, mangoID)
+	if mango.OwnedBy == owner {
+		mango.OwnedBy = newOwner
+		bytes, _ := json.Marshal(mango)
+		return ctx.GetStub().PutState(mangoID, bytes)
+	} else {
+		return fmt.Errorf("assset is not owned by %v, only original owner can sell the asset", owner)
+	}
+
+}
+
 func main() {
 	mangoContract := new(MangoContract)
 	chaincode, err := contractapi.NewChaincode(mangoContract)
